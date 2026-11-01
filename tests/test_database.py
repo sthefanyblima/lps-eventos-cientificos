@@ -1,5 +1,6 @@
-"""Testes de integração com SQLite temporário, usando o banco real via SQLAlchemy."""
+"""Testes de integração com SQLite ou MySQL, usando o banco real via SQLAlchemy."""
 
+import os
 from uuid import uuid4
 
 import pytest
@@ -14,9 +15,33 @@ from services.users.service import DomainError, UserService
 
 @pytest.fixture
 def db_tenant(tmp_path, monkeypatch):
-    """Cria um arquivo de banco isolado para cada teste, sem precisar de MySQL."""
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path}/{{db}}.db")
-    return f"dbtest_{uuid4().hex}"
+    """Usa MySQL quando TEST_DATABASE_URL está definida; caso contrário, SQLite temporário."""
+    database_url = os.environ.get("TEST_DATABASE_URL")
+    if not database_url:
+        database_url = f"sqlite:///{tmp_path}/{{db}}.db"
+    monkeypatch.setenv("DATABASE_URL", database_url)
+    tenant = f"dbtest_{uuid4().hex}"
+    yield tenant
+
+    # No modo MySQL, remove só os bancos temporários criados por este teste.
+    if database_url.startswith("mysql"):
+        from sqlalchemy import create_engine, text
+        from sqlalchemy.engine import make_url
+
+        from common.database import _engines, database_name, database_url as resolve_database_url
+
+        for service in ("users", "events", "submissions"):
+            factory = _engines.pop(f"{service}:{tenant}", None)
+            if factory is not None:
+                factory.kw["bind"].dispose()
+            server_url = make_url(resolve_database_url(service, tenant)).set(database="")
+            engine = create_engine(server_url, pool_pre_ping=True)
+            try:
+                with engine.begin() as connection:
+                    db_name = database_name(service, tenant)
+                    connection.execute(text(f"DROP DATABASE IF EXISTS `{db_name}`"))
+            finally:
+                engine.dispose()
 
 
 def test_login_le_usuario_semeado_e_persiste_historico(db_tenant):
