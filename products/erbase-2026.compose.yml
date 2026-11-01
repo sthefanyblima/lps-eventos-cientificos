@@ -1,0 +1,182 @@
+# Gerado automaticamente pela LPS — produto: ERBASE 2026 — Escola Regional de Computação
+services:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: lps
+      MYSQL_PASSWORD: lps123
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    ports: ["3306:3306"]
+    volumes: ["./mysql-init.sql:/docker-entrypoint-initdb.d/init.sql", "mysql-data:/var/lib/mysql"]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-proot"]
+      interval: 5s
+      retries: 20
+  registry:
+    build: ..
+    command: uvicorn services.registry.main:app --host 0.0.0.0 --port 8761
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8761:8761"]
+  users:
+    build: ..
+    command: uvicorn services.users.main:app --host 0.0.0.0 --port 8001
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8001:8001"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  events:
+    build: ..
+    command: uvicorn services.events.main:app --host 0.0.0.0 --port 8002
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8002:8002"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  registration:
+    build: ..
+    command: uvicorn services.registration.main:app --host 0.0.0.0 --port 8003
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8003:8003"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  recommendation:
+    build: ..
+    command: uvicorn services.recommendation.main:app --host 0.0.0.0 --port 8004
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8004:8004"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  submissions:
+    build: ..
+    command: uvicorn services.submissions.main:app --host 0.0.0.0 --port 8005
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8005:8005"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  reviews:
+    build: ..
+    command: uvicorn services.reviews.main:app --host 0.0.0.0 --port 8006
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8006:8006"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  certificates:
+    build: ..
+    command: uvicorn services.certificates.main:app --host 0.0.0.0 --port 8007
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8007:8007"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  notifications:
+    build: ..
+    command: uvicorn services.notifications.main:app --host 0.0.0.0 --port 8008
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8008:8008"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  ai-agent:
+    build: ..
+    command: uvicorn services.ai_agent.main:app --host 0.0.0.0 --port 8009
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8009:8009"]
+    depends_on:
+      mysql:
+        condition: service_healthy
+      registry:
+        condition: service_started
+  gateway:
+    build: ..
+    command: uvicorn gateway.main:app --host 0.0.0.0 --port 8080
+    environment:
+      PRODUCT_CONFIG: /app/products/erbase-2026.json
+      SERVICE_HOST_MODE: docker
+      DATABASE_URL: mysql+pymysql://lps:lps123@mysql:3306/{db}
+      REGISTRY_URL: http://registry:8761
+    ports: ["8080:8080"]
+    depends_on:
+      registry:
+        condition: service_started
+      users:
+        condition: service_started
+      events:
+        condition: service_started
+      registration:
+        condition: service_started
+      recommendation:
+        condition: service_started
+      submissions:
+        condition: service_started
+      reviews:
+        condition: service_started
+      certificates:
+        condition: service_started
+      notifications:
+        condition: service_started
+      ai-agent:
+        condition: service_started
+volumes:
+  mysql-data:

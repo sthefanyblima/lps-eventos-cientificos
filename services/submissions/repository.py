@@ -1,0 +1,29 @@
+"""Repository — acesso a dados do Submissions Service."""
+from __future__ import annotations
+
+from sqlalchemy import select
+from sqlalchemy.orm import Session, selectinload
+
+from .model import Coautor, PalavraChave, Submissao
+
+
+class SubmissionRepository:
+    def __init__(self, session: Session):
+        self.s = session
+
+    def add(self, author_id, title, abstract, authors: list[str], keywords: list[str], fmt) -> Submissao:
+        sub = Submissao(autor_id=author_id, titulo=title, resumo=abstract, formato=fmt,
+                        coautores=[Coautor(nome=n, ordem=i + 1) for i, n in enumerate(authors)],
+                        palavras=[PalavraChave(termo=k) for k in keywords])
+        self.s.add(sub)
+        self.s.flush()
+        return sub
+
+    def get(self, sid: int) -> Submissao | None:
+        return self.s.get(Submissao, sid)
+
+    def list(self, author_id: int | None = None) -> list[Submissao]:
+        q = select(Submissao).options(selectinload(Submissao.coautores), selectinload(Submissao.palavras)).order_by(Submissao.id)
+        if author_id:
+            q = q.where(Submissao.autor_id == author_id)
+        return list(self.s.scalars(q))

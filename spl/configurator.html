@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configurador da LPS — Eventos Científicos</title>
+<style>
+  :root { --bg:#f1f5f9; --card:#fff; --ink:#0f172a; --muted:#64748b; --line:#e2e8f0; --pri:#4f46e5; --ok:#15803d; --err:#b91c1c; }
+  * { box-sizing:border-box }
+  body { margin:0; font:15px/1.45 system-ui, sans-serif; background:var(--bg); color:var(--ink) }
+  header { background:#1e1b4b; color:#fff; padding:18px 28px }
+  header h1 { margin:0; font-size:20px } header p { margin:4px 0 0; opacity:.75 }
+  main { display:grid; grid-template-columns: 1.15fr 1fr; gap:20px; padding:20px 28px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px }
+  h2 { font-size:16px; margin:0 0 12px }
+  ul.tree, ul.tree ul { list-style:none; margin:0; padding-left:22px }
+  ul.tree { padding-left:0 }
+  ul.tree li { margin:3px 0 }
+  .feat { display:inline-flex; align-items:center; gap:7px; padding:2px 6px; border-radius:6px }
+  .feat.off { opacity:.45 }
+  .kind { font:600 10px ui-monospace,monospace; padding:1px 6px; border-radius:4px; border:1px solid }
+  .k-mandatory { color:#1d4ed8; border-color:#93c5fd } .k-optional { color:#7c3aed; border-color:#c4b5fd }
+  .k-xor-child { color:#b45309; border-color:#fcd34d } .k-or-child { color:#0f766e; border-color:#5eead4 }
+  .svc { font:12px ui-monospace,monospace; color:#fff; background:#334155; padding:1px 7px; border-radius:99px }
+  .grp { font-size:11px; color:var(--muted) }
+  label.row { display:flex; gap:10px; align-items:center; margin-bottom:10px }
+  input[type=text] { flex:1; padding:8px 10px; border:1px solid var(--line); border-radius:8px; font:inherit }
+  button { font:600 14px system-ui; border:0; border-radius:8px; padding:10px 14px; cursor:pointer; background:var(--pri); color:#fff }
+  button.sec { background:#e0e7ff; color:#3730a3 } button:disabled { opacity:.4; cursor:not-allowed }
+  .status { padding:10px 12px; border-radius:8px; margin:10px 0; font-weight:600 }
+  .status.ok { background:#dcfce7; color:var(--ok) } .status.bad { background:#fee2e2; color:var(--err) }
+  .status ul { margin:6px 0 0; font-weight:400 }
+  table { width:100%; border-collapse:collapse; font-size:14px } td, th { padding:6px 8px; border-bottom:1px solid var(--line); text-align:left }
+  .chips span { display:inline-block; margin:2px; padding:2px 8px; border-radius:99px; background:#eef2ff; color:#3730a3; font-size:12px }
+  .legend span { margin-right:10px }
+  pre { background:#0f172a; color:#e2e8f0; padding:10px; border-radius:8px; overflow:auto; font-size:12px; max-height:180px }
+  @media (max-width: 900px) { main { grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Tela de Configuração — Seletor de Features</h1>
+  <p id="model-name">LPS</p>
+</header>
+<main>
+  <section class="card">
+    <h2>1. Selecione as features do produto</h2>
+    <div class="legend grp">
+      <span class="kind k-mandatory">obrigatória</span> <span class="kind k-optional">opcional</span>
+      <span class="kind k-xor-child">alternativa (xor)</span> <span class="kind k-or-child">or</span>
+      <span class="svc">microservice</span>
+    </div>
+    <p class="grp">Carregar produto existente: <select id="load"><option value="">—</option></select></p>
+    <ul class="tree" id="tree"></ul>
+    <p class="grp" id="constraints"></p>
+  </section>
+  <section>
+    <div class="card">
+      <h2>2. Valide e construa o novo produto</h2>
+      <label class="row">Nome do produto <input type="text" id="name" value="Novo Evento Científico"></label>
+      <label class="row">Cor do tema <input type="color" id="theme" value="#2563eb"></label>
+      <div id="status" class="status">—</div>
+      <button id="derive">Gerar produto</button>
+      <button id="run" class="sec" disabled>Executar produto</button>
+      <p id="files" class="grp"></p>
+    </div>
+    <div class="card" style="margin-top:16px">
+      <h2>3. Produto resultante</h2>
+      <h3 style="font-size:14px;margin:8px 0">Microservices</h3>
+      <table id="services"><tr><td class="grp">—</td></tr></table>
+      <h3 style="font-size:14px;margin:12px 0 6px">Componentes (pontos de variação → variantes)</h3>
+      <table id="components"><tr><td class="grp">—</td></tr></table>
+      <h3 style="font-size:14px;margin:12px 0 6px">Features selecionadas</h3>
+      <div class="chips" id="chips"></div>
+    </div>
+  </section>
+</main>
+<script>
+const sel = new Set();
+let MODEL, byId = {}, parentOf = {}, lastProduct = null;
+
+function index(n, p) { byId[n.id] = n; parentOf[n.id] = p; n.children.forEach(c => index(c, n)); }
+
+function propagate() {
+  // pais selecionados ⇒ filhas obrigatórias selecionadas; filha selecionada ⇒ pai selecionado
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const id of [...sel]) {
+      const p = parentOf[id];
+      if (p && !sel.has(p.id)) { sel.add(p.id); changed = true; }
+      const n = byId[id];
+      if (!n.group) n.children.forEach(c => { if (c.kind === 'mandatory' && !sel.has(c.id)) { sel.add(c.id); changed = true; } });
+      if (n.group === 'xor' && !n.children.some(c => sel.has(c.id))) { sel.add(n.children[0].id); changed = true; }
+      if (n.group === 'or' && !n.children.some(c => sel.has(c.id))) { sel.add(n.children[0].id); changed = true; }
+    }
+  }
+}
+function deselect(id) { sel.delete(id); byId[id].children.forEach(c => deselect(c.id)); }
+
+function toggle(n, checked) {
+  if (n.kind === 'xor-child') { parentOf[n.id].children.forEach(c => deselect(c.id)); sel.add(n.id); }
+  else if (checked) sel.add(n.id); else deselect(n.id);
+  propagate(); render(); validate();
+}
+
+function node(n) {
+  const li = document.createElement('li');
+  const p = parentOf[n.id];
+  const on = sel.has(n.id);
+  const parentOn = !p || sel.has(p.id);
+  let input;
+  if (n.kind === 'xor-child') { input = `<input type="radio" name="g-${p.id}" ${on ? 'checked' : ''} ${parentOn ? '' : 'disabled'}>`; }
+  else { input = `<input type="checkbox" ${on ? 'checked' : ''} ${(n.kind === 'mandatory' || !parentOn) ? 'disabled' : ''}>`; }
+  li.innerHTML = `<span class="feat ${on ? '' : 'off'}">${input}<b>${n.name}</b>
+     <span class="kind k-${n.kind}">${n.kind.replace('-child', '')}</span>
+     ${n.group ? `<span class="grp">[grupo ${n.group.toUpperCase()} · ponto de variação <code>${n.binding}</code>]</span>` : ''}
+     ${n.service ? `<span class="svc">${n.service}</span>` : ''}</span>`;
+  const el = li.querySelector('input');
+  el.addEventListener('change', e => toggle(n, e.target.checked));
+  if (n.children.length) { const ul = document.createElement('ul'); n.children.forEach(c => ul.appendChild(node(c))); li.appendChild(ul); }
+  return li;
+}
+function render() { const t = document.getElementById('tree'); t.innerHTML = ''; t.appendChild(node(MODEL.tree)); }
+
+async function validate() {
+  const r = await fetch('/api/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ features: [...sel], name: document.getElementById('name').value, theme: document.getElementById('theme').value }) });
+  const d = await r.json();
+  const st = document.getElementById('status');
+  st.className = 'status ' + (d.valid ? 'ok' : 'bad');
+  st.innerHTML = d.valid ? '✔ Configuração válida segundo o modelo de features'
+                         : '✘ Configuração inválida<ul>' + d.errors.map(e => `<li>${e}</li>`).join('') + '</ul>';
+  document.getElementById('derive').disabled = !d.valid;
+  const svcs = document.getElementById('services'), comps = document.getElementById('components');
+  if (d.preview) {
+    svcs.innerHTML = '<tr><th>Microservice</th><th>Porta</th><th>Feature</th></tr>' + Object.entries(d.preview.services)
+      .map(([k, v]) => `<tr><td><b>${v.title}</b></td><td><code>${v.port}</code></td><td>${v.feature}</td></tr>`).join('')
+      + `<tr><td><b>API Gateway</b></td><td><code>8080</code></td><td>—</td></tr>`;
+    comps.innerHTML = '<tr><th>Ponto de variação</th><th>Variante(s)</th></tr>' + Object.entries(d.preview.components)
+      .map(([k, v]) => `<tr><td><code>${k}</code></td><td>${[].concat(v).join(', ')}</td></tr>`).join('');
+  } else {
+    svcs.innerHTML = comps.innerHTML = '<tr><td class="grp">Corrija a configuração para ver o produto resultante.</td></tr>';
+  }
+  document.getElementById('chips').innerHTML = d.features.map(f => `<span>${f}</span>`).join('');
+}
+
+document.getElementById('derive').onclick = async () => {
+  const r = await fetch('/api/derive', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ features: [...sel], name: document.getElementById('name').value, theme: document.getElementById('theme').value }) });
+  const d = await r.json();
+  if (!r.ok) { alert(d.detail); return; }
+  lastProduct = d.product.id;
+  document.getElementById('files').innerHTML = '✔ Produto <b>' + d.product.name + '</b> gerado: ' + d.files.map(f => `<code>${f}</code>`).join(' e ');
+  document.getElementById('run').disabled = false;
+  loadProducts();
+};
+document.getElementById('run').onclick = async () => {
+  const r = await fetch('/api/run/' + lastProduct, { method: 'POST' });
+  const d = await r.json();
+  document.getElementById('files').innerHTML += `<br>▶ Executando: <a href="${d.url}" target="_blank">${d.url}</a> · <a href="${d.ports}" target="_blank">portas</a>`;
+};
+document.getElementById('name').oninput = validate;
+document.getElementById('load').onchange = async e => {
+  const ps = await (await fetch('/api/products')).json();
+  const p = ps.find(x => x.id === e.target.value); if (!p) return;
+  sel.clear(); p.features.forEach(f => sel.add(f));
+  document.getElementById('name').value = p.name; document.getElementById('theme').value = p.theme || '#2563eb';
+  lastProduct = p.id; document.getElementById('run').disabled = false;
+  render(); validate();
+};
+async function loadProducts() {
+  const ps = await (await fetch('/api/products')).json();
+  document.getElementById('load').innerHTML = '<option value="">—</option>' + ps.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+}
+
+(async () => {
+  MODEL = await (await fetch('/api/model')).json();
+  document.getElementById('model-name').textContent = MODEL.name;
+  index(MODEL.tree, null);
+  sel.add(MODEL.tree.id); propagate(); render(); validate(); loadProducts();
+  document.getElementById('constraints').innerHTML = '<b>Restrições:</b> ' +
+    MODEL.constraints.map(c => `${byId[c.from].name} <i>${c.type}</i> ${byId[c.to].name}`).join(' · ');
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+{
+  "name": "LPS para Sistemas de Gerenciamento de Eventos Científicos",
+  "version": "1.0.0",
+  "notation": "FODA (Kang et al., 1990) — mandatory | optional | grupo xor (alternativo) | grupo or",
+  "root": {
+    "id": "EventoCientifico",
+    "name": "Sistema de Gerenciamento de Evento Científico",
+    "type": "mandatory",
+    "children": [
+      {
+        "id": "GestaoUsuarios",
+        "name": "Gestão de Usuários",
+        "type": "mandatory",
+        "service": "users",
+        "children": [
+          {
+            "id": "Autenticacao",
+            "name": "Autenticação",
+            "type": "mandatory"
+          },
+          {
+            "id": "PerfilInteresses",
+            "name": "Perfil e Histórico de Interesses",
+            "type": "mandatory"
+          }
+        ]
+      },
+      {
+        "id": "GestaoEvento",
+        "name": "Gestão do Evento",
+        "type": "mandatory",
+        "service": "events",
+        "children": [
+          {
+            "id": "Programacao",
+            "name": "Programação (sessões)",
+            "type": "mandatory"
+          },
+          {
+            "id": "Trilhas",
+            "name": "Trilhas temáticas",
+            "type": "optional"
+          }
+        ]
+      },
+      {
+        "id": "Inscricao",
+        "name": "Inscrição e Agenda",
+        "type": "mandatory",
+        "service": "registration",
+        "children": [
+          {
+            "id": "Pagamento",
+            "name": "Pagamento",
+            "type": "mandatory",
+            "group": "xor",
+            "binding": "payment",
+            "children": [
+              {
+                "id": "Gratuito",
+                "name": "Gratuito"
+              },
+              {
+                "id": "Pix",
+                "name": "PIX (simulado)"
+              },
+              {
+                "id": "CartaoCredito",
+                "name": "Cartão de crédito (simulado)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Recomendacao",
+        "name": "Recomendação por perfil (histórico)",
+        "type": "mandatory",
+        "service": "recommendation",
+        "children": [
+          {
+            "id": "EstrategiaRecomendacao",
+            "name": "Estratégia",
+            "type": "mandatory",
+            "group": "xor",
+            "binding": "recommendation_strategy",
+            "children": [
+              {
+                "id": "BaseadaConteudo",
+                "name": "Baseada em conteúdo"
+              },
+              {
+                "id": "Popularidade",
+                "name": "Popularidade"
+              },
+              {
+                "id": "Hibrida",
+                "name": "Híbrida (conteúdo + popularidade)"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Submissao",
+        "name": "Submissão de Trabalhos",
+        "type": "optional",
+        "service": "submissions",
+        "children": [
+          {
+            "id": "FormatoSubmissao",
+            "name": "Formatos aceitos",
+            "type": "mandatory",
+            "group": "or",
+            "binding": "submission_formats",
+            "children": [
+              {
+                "id": "ArtigoCompleto",
+                "name": "Artigo completo"
+              },
+              {
+                "id": "ResumoExpandido",
+                "name": "Resumo expandido"
+              },
+              {
+                "id": "Poster",
+                "name": "Pôster"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Revisao",
+        "name": "Revisão por Pares",
+        "type": "optional",
+        "service": "reviews",
+        "children": [
+          {
+            "id": "PoliticaRevisao",
+            "name": "Política de revisão",
+            "type": "mandatory",
+            "group": "xor",
+            "binding": "review_policy",
+            "children": [
+              {
+                "id": "SimplesCego",
+                "name": "Simples-cego"
+              },
+              {
+                "id": "DuploCego",
+                "name": "Duplo-cego"
+              },
+              {
+                "id": "Aberta",
+                "name": "Revisão aberta"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Certificados",
+        "name": "Emissão de Certificados",
+        "type": "optional",
+        "service": "certificates",
+        "children": [
+          {
+            "id": "TipoCertificado",
+            "name": "Tipos de certificado",
+            "type": "mandatory",
+            "group": "or",
+            "binding": "certificate_types",
+            "children": [
+              {
+                "id": "CertParticipacao",
+                "name": "Participação"
+              },
+              {
+                "id": "CertApresentacao",
+                "name": "Apresentação de trabalho"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Notificacoes",
+        "name": "Notificações",
+        "type": "optional",
+        "service": "notifications",
+        "children": [
+          {
+            "id": "CanalNotificacao",
+            "name": "Canais",
+            "type": "mandatory",
+            "group": "or",
+            "binding": "notification_channels",
+            "children": [
+              {
+                "id": "Email",
+                "name": "E-mail (simulado)"
+              },
+              {
+                "id": "InApp",
+                "name": "No aplicativo"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "AssistenteIA",
+        "name": "Assistente com Agente de IA (Agentic AI)",
+        "type": "optional",
+        "service": "ai_agent",
+        "children": [
+          {
+            "id": "ProvedorIA",
+            "name": "Provedor do agente (AI models)",
+            "type": "mandatory",
+            "group": "xor",
+            "binding": "ai_provider",
+            "children": [
+              {
+                "id": "AgenteLLM",
+                "name": "LLM externo (Claude, tool use)"
+              },
+              {
+                "id": "AgenteLocal",
+                "name": "Agente local baseado em regras"
+              }
+            ]
+          },
+          {
+            "id": "GuardrailsRAI",
+            "name": "Plugins de IA responsável (guardrails, caixa-preta, explainer)",
+            "type": "mandatory"
+          },
+          {
+            "id": "MemoriaLongoPrazo",
+            "name": "Memória de longo prazo (MySQL)",
+            "type": "optional"
+          }
+        ]
+      }
+    ]
+  },
+  "constraints": [
+    {
+      "type": "requires",
+      "from": "Revisao",
+      "to": "Submissao",
+      "reason": "Só há revisão se houver trabalhos submetidos"
+    },
+    {
+      "type": "requires",
+      "from": "CertApresentacao",
+      "to": "Submissao",
+      "reason": "Certificado de apresentação depende de trabalho aceito"
+    },
+    {
+      "type": "requires",
+      "from": "CertApresentacao",
+      "to": "Revisao",
+      "reason": "Trabalho só é 'aceito' após a revisão"
+    }
+  ]
+}

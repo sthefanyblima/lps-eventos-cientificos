@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evento Científico</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header id="top">
+  <div>
+    <h1 id="ev-name">Evento</h1>
+    <p id="ev-sub"></p>
+  </div>
+  <div id="who"></div>
+</header>
+<div id="ms-strip" title="Microservices que compõem este produto (derivados da LPS)"></div>
+
+<section id="login" class="card narrow">
+  <h2>Entrar <span class="badge" data-svc="users"></span></h2>
+  <form id="login-form" class="form">
+    <input name="email" type="email" placeholder="E-mail" required autocomplete="username">
+    <input name="password" type="password" placeholder="Senha" required autocomplete="current-password">
+    <button>Entrar</button>
+    <p id="login-error" class="bad" hidden></p>
+  </form>
+  <p class="muted" style="margin-top:14px">Contas de demonstração (clique para preencher) — o token JWT é validado pelo API Gateway:</p>
+  <div id="user-list"></div>
+</section>
+
+<nav id="tabs" hidden></nav>
+<main id="app" hidden>
+  <section data-tab="programacao" data-feature="Programacao" data-label="Programação">
+    <h2>Programação <span class="badge" data-svc="events"></span></h2>
+    <div class="toolbar"><input id="q" placeholder="Buscar por tema, título, palestrante…"><select id="track" hidden></select></div>
+    <div id="sessions" class="grid"></div>
+  </section>
+
+  <section data-tab="recomendacoes" data-feature="Recomendacao" data-label="Para você">
+    <h2>Recomendado para você <span class="badge" data-svc="recommendation"></span></h2>
+    <p class="muted" id="rec-info"></p>
+    <div id="recs" class="grid"></div>
+    <details class="card" id="rec-hist-box"><summary><b>Histórico de recomendações</b> (persistido no banco do Recommendation Service)</summary><div id="rec-hist"></div></details>
+  </section>
+
+  <section data-tab="inscricao" data-feature="Inscricao" data-label="Inscrição e Agenda">
+    <h2>Inscrição <span class="badge" data-svc="registration"></span></h2>
+    <div id="reg" class="card"></div>
+    <h2>Minha agenda <span class="badge" data-svc="registration"></span></h2>
+    <div id="agenda"></div>
+  </section>
+
+  <section data-tab="submissoes" data-feature="Submissao" data-label="Submissões">
+    <h2>Submeter trabalho <span class="badge" data-svc="submissions"></span></h2>
+    <form id="sub-form" class="card form">
+      <input name="title" placeholder="Título" required minlength="5">
+      <input name="authors" placeholder="Autores" required>
+      <input name="keywords" placeholder="Palavras-chave">
+      <textarea name="abstract" placeholder="Resumo"></textarea>
+      <select name="format" id="formats"></select>
+      <button>Submeter</button>
+    </form>
+    <h2>Minhas submissões</h2>
+    <div id="my-subs"></div>
+  </section>
+
+  <section data-tab="revisao" data-feature="Revisao" data-label="Revisão">
+    <h2>Fila de revisão <span class="badge" data-svc="reviews"></span></h2>
+    <p class="muted" id="policy"></p>
+    <div id="queue"></div>
+  </section>
+
+  <section data-tab="certificados" data-feature="Certificados" data-label="Certificados">
+    <h2>Meus certificados <span class="badge" data-svc="certificates"></span></h2>
+    <div id="certs"></div>
+  </section>
+
+  <section data-tab="notificacoes" data-feature="Notificacoes" data-label="Notificações">
+    <h2>Notificações <span class="badge" data-svc="notifications"></span></h2>
+    <div id="inbox"></div>
+  </section>
+
+  <section data-tab="assistente" data-feature="AssistenteIA" data-label="Assistente IA">
+    <h2>Assistente do evento <span class="badge" data-svc="ai_agent"></span></h2>
+    <p class="muted" id="agent-info"></p>
+    <details class="card" id="agent-arch"><summary><b>Arquitetura do agente</b> (referência: Lu et al., 2024)</summary><div id="arch"></div></details>
+    <div id="chat" class="card"></div>
+    <form id="chat-form" class="toolbar">
+      <input id="msg" placeholder="Ex.: me recomende sessões e adicione a melhor à agenda" autocomplete="off">
+      <button>Enviar</button>
+    </form>
+    <div class="chips" id="suggestions"></div>
+  </section>
+</main>
+<footer><a href="/ports">Portas dos microservices</a> · <a href="/docs">API Gateway (Swagger)</a></footer>
+<script src="app.js"></script>
+</body>
+</html>

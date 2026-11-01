@@ -1,0 +1,34 @@
+{
+  "users": [
+    {"name": "Ana Souza", "email": "ana@exemplo.edu.br", "role": "participante", "interests": ["linha de produto de software", "microservices", "arquitetura"]},
+    {"name": "Bruno Lima", "email": "bruno@exemplo.edu.br", "role": "autor", "interests": ["inteligência artificial", "agentes", "llm"]},
+    {"name": "Carla Mendes", "email": "carla@exemplo.edu.br", "role": "revisor", "interests": ["testes de software", "qualidade", "devops"]},
+    {"name": "Diego Alves", "email": "diego@exemplo.edu.br", "role": "participante", "interests": ["engenharia de requisitos", "metodologias ágeis"]},
+    {"name": "Elisa Rocha", "email": "elisa@exemplo.edu.br", "role": "organizador", "interests": ["educação em computação", "ensino"]}
+  ],
+  "tracks": ["Arquitetura e Reuso", "IA para Engenharia de Software", "Qualidade e DevOps", "Processos e Requisitos", "Educação"],
+  "sessions": [
+    {"title": "Linhas de Produto de Software com Microservices", "track": "Arquitetura e Reuso", "tags": ["linha de produto de software", "microservices", "reuso"], "speaker": "Profa. Marina Costa", "day": "2026-11-10", "start": "09:00", "room": "Auditório A", "kind": "Palestra"},
+    {"title": "Modelagem de Variabilidade com Diagramas de Features", "track": "Arquitetura e Reuso", "tags": ["variabilidade", "feature model", "linha de produto de software"], "speaker": "Dr. Paulo Nery", "day": "2026-11-10", "start": "10:30", "room": "Sala 1", "kind": "Tutorial"},
+    {"title": "API Gateway e Service Mesh na prática", "track": "Arquitetura e Reuso", "tags": ["api gateway", "microservices", "arquitetura"], "speaker": "Eng. Rafael Torres", "day": "2026-11-10", "start": "14:00", "room": "Sala 2", "kind": "Minicurso"},
+    {"title": "Multi-tenancy em SaaS: isolamento e configuração", "track": "Arquitetura e Reuso", "tags": ["saas", "multi-tenant", "arquitetura"], "speaker": "Dra. Lúcia Prado", "day": "2026-11-11", "start": "09:00", "room": "Auditório A", "kind": "Palestra"},
+    {"title": "Agentes de IA para geração de código", "track": "IA para Engenharia de Software", "tags": ["agentes", "llm", "inteligência artificial"], "speaker": "Dr. Henrique Sales", "day": "2026-11-10", "start": "16:00", "room": "Auditório A", "kind": "Keynote"},
+    {"title": "LLMs no apoio à revisão de código", "track": "IA para Engenharia de Software", "tags": ["llm", "revisão de código", "qualidade"], "speaker": "Profa. Beatriz Leão", "day": "2026-11-11", "start": "10:30", "room": "Sala 1", "kind": "Artigos"},
+    {"title": "Agentic AI e orquestração de ferramentas", "track": "IA para Engenharia de Software", "tags": ["agentes", "agentic ai", "microservices"], "speaker": "Eng. Laura Campos", "day": "2026-11-12", "start": "09:00", "room": "Sala 2", "kind": "Painel"},
+    {"title": "Testes automatizados em microservices", "track": "Qualidade e DevOps", "tags": ["testes de software", "microservices", "devops"], "speaker": "Dr. Ícaro Melo", "day": "2026-11-11", "start": "14:00", "room": "Sala 2", "kind": "Minicurso"},
+    {"title": "Pipelines de entrega contínua com Docker", "track": "Qualidade e DevOps", "tags": ["devops", "docker", "entrega contínua"], "speaker": "Eng. Sara Pinto", "day": "2026-11-12", "start": "10:30", "room": "Laboratório 3", "kind": "Oficina"},
+    {"title": "Métricas de qualidade e dívida técnica", "track": "Qualidade e DevOps", "tags": ["qualidade", "métricas", "manutenção"], "speaker": "Prof. Otávio Reis", "day": "2026-11-12", "start": "14:00", "room": "Sala 1", "kind": "Artigos"},
+    {"title": "Scrum em projetos acadêmicos", "track": "Processos e Requisitos", "tags": ["metodologias ágeis", "scrum", "processos"], "speaker": "Profa. Júlia Freitas", "day": "2026-11-11", "start": "16:00", "room": "Sala 1", "kind": "Palestra"},
+    {"title": "Engenharia de requisitos para sistemas configuráveis", "track": "Processos e Requisitos", "tags": ["engenharia de requisitos", "variabilidade"], "speaker": "Dr. Marcos Vieira", "day": "2026-11-12", "start": "16:00", "room": "Auditório A", "kind": "Artigos"},
+    {"title": "Ensino de Engenharia de Software com projetos reais", "track": "Educação", "tags": ["educação em computação", "ensino", "projetos"], "speaker": "Profa. Elisa Rocha", "day": "2026-11-11", "start": "11:00", "room": "Sala 3", "kind": "Painel"},
+    {"title": "Maratonas de programação como ferramenta de ensino", "track": "Educação", "tags": ["ensino", "algoritmos", "maratona de programação"], "speaker": "Prof. André Lins", "day": "2026-11-12", "start": "11:00", "room": "Sala 3", "kind": "Palestra"}
+  ],
+  "history": [
+    {"user": 1, "session": 2, "action": "view"}, {"user": 1, "session": 4, "action": "favorite"},
+    {"user": 2, "session": 5, "action": "favorite"}, {"user": 2, "session": 6, "action": "view"},
+    {"user": 3, "session": 8, "action": "agenda"}, {"user": 3, "session": 1, "action": "view"},
+    {"user": 4, "session": 1, "action": "agenda"}, {"user": 4, "session": 11, "action": "favorite"},
+    {"user": 5, "session": 1, "action": "favorite"}, {"user": 5, "session": 5, "action": "view"},
+    {"user": 3, "session": 5, "action": "favorite"}, {"user": 4, "session": 5, "action": "view"}
+  ]
+}

@@ -1,0 +1,69 @@
+{
+  "id": "semana-ic-ufal",
+  "name": "Semana de Computação UFAL 2026",
+  "theme": "#b91c1c",
+  "features": [
+    "Autenticacao",
+    "CertParticipacao",
+    "Certificados",
+    "EstrategiaRecomendacao",
+    "EventoCientifico",
+    "GestaoEvento",
+    "GestaoUsuarios",
+    "Gratuito",
+    "Inscricao",
+    "Pagamento",
+    "PerfilInteresses",
+    "Popularidade",
+    "Programacao",
+    "Recomendacao",
+    "TipoCertificado"
+  ],
+  "services": {
+    "users": {
+      "port": 8001,
+      "url": "http://127.0.0.1:8001",
+      "title": "Users Service",
+      "feature": "GestaoUsuarios"
+    },
+    "events": {
+      "port": 8002,
+      "url": "http://127.0.0.1:8002",
+      "title": "Events Service",
+      "feature": "GestaoEvento"
+    },
+    "registration": {
+      "port": 8003,
+      "url": "http://127.0.0.1:8003",
+      "title": "Registration Service",
+      "feature": "Inscricao"
+    },
+    "recommendation": {
+      "port": 8004,
+      "url": "http://127.0.0.1:8004",
+      "title": "Recommendation Service",
+      "feature": "Recomendacao"
+    },
+    "certificates": {
+      "port": 8007,
+      "url": "http://127.0.0.1:8007",
+      "title": "Certificates Service",
+      "feature": "Certificados"
+    }
+  },
+  "gateway": {
+    "port": 8080,
+    "url": "http://127.0.0.1:8080"
+  },
+  "registry": {
+    "port": 8761,
+    "url": "http://127.0.0.1:8761"
+  },
+  "components": {
+    "payment": "Gratuito",
+    "recommendation_strategy": "Popularidade",
+    "certificate_types": [
+      "CertParticipacao"
+    ]
+  }
+}

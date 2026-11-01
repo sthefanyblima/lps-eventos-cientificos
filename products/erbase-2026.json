@@ -1,0 +1,116 @@
+{
+  "id": "erbase-2026",
+  "name": "ERBASE 2026 — Escola Regional de Computação",
+  "theme": "#0f766e",
+  "features": [
+    "AgenteLocal",
+    "AssistenteIA",
+    "Autenticacao",
+    "BaseadaConteudo",
+    "CanalNotificacao",
+    "CertParticipacao",
+    "Certificados",
+    "EstrategiaRecomendacao",
+    "EventoCientifico",
+    "FormatoSubmissao",
+    "GestaoEvento",
+    "GestaoUsuarios",
+    "GuardrailsRAI",
+    "InApp",
+    "Inscricao",
+    "Notificacoes",
+    "Pagamento",
+    "PerfilInteresses",
+    "Pix",
+    "PoliticaRevisao",
+    "Poster",
+    "Programacao",
+    "ProvedorIA",
+    "Recomendacao",
+    "ResumoExpandido",
+    "Revisao",
+    "SimplesCego",
+    "Submissao",
+    "TipoCertificado"
+  ],
+  "services": {
+    "users": {
+      "port": 8001,
+      "url": "http://127.0.0.1:8001",
+      "title": "Users Service",
+      "feature": "GestaoUsuarios"
+    },
+    "events": {
+      "port": 8002,
+      "url": "http://127.0.0.1:8002",
+      "title": "Events Service",
+      "feature": "GestaoEvento"
+    },
+    "registration": {
+      "port": 8003,
+      "url": "http://127.0.0.1:8003",
+      "title": "Registration Service",
+      "feature": "Inscricao"
+    },
+    "recommendation": {
+      "port": 8004,
+      "url": "http://127.0.0.1:8004",
+      "title": "Recommendation Service",
+      "feature": "Recomendacao"
+    },
+    "submissions": {
+      "port": 8005,
+      "url": "http://127.0.0.1:8005",
+      "title": "Submissions Service",
+      "feature": "Submissao"
+    },
+    "reviews": {
+      "port": 8006,
+      "url": "http://127.0.0.1:8006",
+      "title": "Reviews Service",
+      "feature": "Revisao"
+    },
+    "certificates": {
+      "port": 8007,
+      "url": "http://127.0.0.1:8007",
+      "title": "Certificates Service",
+      "feature": "Certificados"
+    },
+    "notifications": {
+      "port": 8008,
+      "url": "http://127.0.0.1:8008",
+      "title": "Notifications Service",
+      "feature": "Notificacoes"
+    },
+    "ai_agent": {
+      "port": 8009,
+      "url": "http://127.0.0.1:8009",
+      "title": "AI Agent Service",
+      "feature": "AssistenteIA"
+    }
+  },
+  "gateway": {
+    "port": 8080,
+    "url": "http://127.0.0.1:8080"
+  },
+  "registry": {
+    "port": 8761,
+    "url": "http://127.0.0.1:8761"
+  },
+  "components": {
+    "payment": "Pix",
+    "recommendation_strategy": "BaseadaConteudo",
+    "submission_formats": [
+      "ResumoExpandido",
+      "Poster"
+    ],
+    "review_policy": "SimplesCego",
+    "certificate_types": [
+      "CertParticipacao"
+    ],
+    "notification_channels": [
+      "InApp"
+    ],
+    "ai_provider": "AgenteLocal"
+  }
+}
