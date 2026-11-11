@@ -17,6 +17,15 @@ PAYMENT = payment_vp.create(component("payment", "Gratuito"))
 FEE = 0.0 if PAYMENT.feature_id == "Gratuito" else 150.0
 
 
+def seed(s, tenant: str) -> None:
+    """Inscrição de demonstração (Diego, já confirmada) para o painel do organizador não começar vazio."""
+    repo = RegistrationRepository(s)
+    if repo.list():
+        return
+    repo.save_attempt(4, PAYMENT.feature_id, {"status": "approved", "amount": FEE,
+                                              "details": "Inscrição de demonstração (dados de exemplo)"})
+
+
 def to_dto(r: Inscricao) -> dict:
     last = r.pagamentos[-1] if r.pagamentos else None
     return {"user_id": r.usuario_id, "status": r.status, "method": r.metodo, "amount": float(r.valor),
@@ -29,7 +38,7 @@ class RegistrationService:
         self.tenant = tenant
 
     def _tx(self):
-        return session_scope("registration", self.tenant, Base)
+        return session_scope("registration", self.tenant, Base, seed)
 
     @staticmethod
     def payment_method() -> dict:

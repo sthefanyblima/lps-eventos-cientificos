@@ -30,5 +30,19 @@
     {"user": 4, "session": 1, "action": "agenda"}, {"user": 4, "session": 11, "action": "favorite"},
     {"user": 5, "session": 1, "action": "favorite"}, {"user": 5, "session": 5, "action": "view"},
     {"user": 3, "session": 5, "action": "favorite"}, {"user": 4, "session": 5, "action": "view"}
+  ],
+  "submissions": [
+    {"author": 2, "title": "Agentes de IA como orquestradores de microsserviços em linhas de produto",
+     "abstract": "Propomos um agente baseado em LLM que usa as APIs dos microsserviços de cada produto como ferramentas, variando conforme as features selecionadas.",
+     "authors": ["Bruno Lima", "Ana Souza"], "keywords": ["agentes", "llm", "microservices"],
+     "formats": ["ArtigoCompleto", "ResumoExpandido", "Poster"]},
+    {"author": 2, "title": "Avaliação de guardrails em assistentes conversacionais para eventos acadêmicos",
+     "abstract": "Comparamos estratégias de guardrails e registro em caixa-preta para assistentes que executam ações em nome do usuário.",
+     "authors": ["Bruno Lima"], "keywords": ["inteligência artificial", "ia responsável"],
+     "formats": ["ResumoExpandido", "ArtigoCompleto", "Poster"]},
+    {"author": 2, "title": "Recomendação híbrida de sessões a partir do histórico de participantes",
+     "abstract": "Combinamos similaridade de conteúdo e popularidade para recomendar sessões de eventos científicos.",
+     "authors": ["Bruno Lima", "Diego Alves"], "keywords": ["recomendação", "personalização"],
+     "formats": ["Poster", "ResumoExpandido", "ArtigoCompleto"]}
   ]
 }

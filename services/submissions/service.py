@@ -6,7 +6,7 @@ from common.database import session_scope
 from common.events import publish
 
 from .model import Base, Submissao
-from .repository import SubmissionRepository
+from .repository import SubmissionRepository, seed
 
 FORMATS = component("submission_formats", ["ArtigoCompleto"])
 LABELS = {"ArtigoCompleto": "Artigo completo", "ResumoExpandido": "Resumo expandido", "Poster": "Pôster"}
@@ -28,7 +28,7 @@ class SubmissionService:
         self.tenant = tenant
 
     def _tx(self):
-        return session_scope("submissions", self.tenant, Base)
+        return session_scope("submissions", self.tenant, Base, seed)
 
     @staticmethod
     def formats() -> list[dict]:

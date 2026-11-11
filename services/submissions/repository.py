@@ -4,7 +4,21 @@ from __future__ import annotations
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
+from common.config import component
+from common.seed import seed_data
+
 from .model import Coautor, PalavraChave, Submissao
+
+
+def seed(s: Session, tenant: str) -> None:
+    """Trabalhos de demonstração do autor, no primeiro formato que o produto aceita."""
+    if s.scalar(select(Submissao.id).limit(1)):
+        return
+    accepted = component("submission_formats", ["ArtigoCompleto"])
+    repo = SubmissionRepository(s)
+    for x in seed_data().get("submissions", []):
+        fmt = next((f for f in x["formats"] if f in accepted), accepted[0])
+        repo.add(x["author"], x["title"], x["abstract"], x["authors"], x["keywords"], fmt)
 
 
 class SubmissionRepository:

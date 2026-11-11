@@ -61,16 +61,27 @@ function enterApp() {
   $('#login').hidden = true; $('#tabs').hidden = false; $('#app').hidden = false;
   $('#who').innerHTML = `${esc(S.user.name)} <span class="muted" style="color:#fff;opacity:.8">(${S.user.role})</span><button class="ghost" id="logout">Sair</button>`;
   $('#logout').onclick = () => location.reload();
-  const sections = [...document.querySelectorAll('main section')].filter(s => has(s.dataset.feature));
-  document.querySelectorAll('main section').forEach(s => { if (!has(s.dataset.feature)) s.remove(); });
+  // abas = features do produto ∩ perfil do usuário (data-roles vazio = todos os perfis)
+  const allowed = s => has(s.dataset.feature) && (!s.dataset.roles || s.dataset.roles.split(' ').includes(S.user.role));
+  const sections = [...document.querySelectorAll('main section')].filter(allowed);
+  document.querySelectorAll('main section').forEach(s => { if (!allowed(s)) s.remove(); });
   $('#tabs').innerHTML = sections.map(s => `<button data-tab="${s.dataset.tab}">${s.dataset.label}</button>`).join('');
   $('#tabs').onclick = e => e.target.dataset.tab && show(e.target.dataset.tab);
-  show(sections[0].dataset.tab);
+  $('#role-info').innerHTML = ROLE_INFO[S.user.role] || '';
+  const start = { autor: 'submissoes', revisor: 'revisao', organizador: 'organizacao' }[S.user.role];
+  show(sections.some(s => s.dataset.tab === start) ? start : sections[0].dataset.tab);
 }
+
+const ROLE_INFO = {
+  participante: '<b>Perfil participante:</b> consulte a programação, receba recomendações pelo seu perfil, faça a inscrição, monte sua agenda e baixe certificados.',
+  autor: '<b>Perfil autor:</b> além do que o participante faz, você submete trabalhos e acompanha o status e os pareceres na aba Submissões.',
+  revisor: '<b>Perfil revisor:</b> avalie os trabalhos da sua fila na aba Revisão. A política de revisão do evento define o que você vê dos autores.',
+  organizador: '<b>Perfil organizador:</b> acompanhe inscrições e trabalhos, cadastre sessões na programação e veja os e-mails enviados na aba Organização.',
+};
 
 const loaders = {
   programacao: loadSessions, recomendacoes: loadRecs, inscricao: loadRegistration, submissoes: loadSubs,
-  revisao: loadQueue, certificados: loadCerts, notificacoes: loadInbox, assistente: loadAgent,
+  revisao: loadQueue, organizacao: loadOrg, certificados: loadCerts, notificacoes: loadInbox, assistente: loadAgent,
 };
 function show(tab) {
   document.querySelectorAll('#tabs button').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
@@ -190,7 +201,7 @@ async function loadQueue() {
   $('#policy').innerHTML = `Política: <b>${pol.label}</b> — ${pol.description}`;
   const q = await api('reviews', `/queue/${S.user.id}`);
   $('#queue').innerHTML = q.map(s => `<div class="card"><b>#${s.id} ${esc(s.title)}</b> <span class="meta">(${s.format})</span><br>
-      <span class="meta">Autores: ${esc(s.authors)} · status: ${s.status}</span><p>${esc(s.abstract)}</p>
+      <span class="meta">Autores: ${esc(s.authors)} · status: ${({ submitted: 'aguardando revisão', under_review: 'em revisão', accepted: 'aceito', rejected: 'rejeitado' })[s.status] || s.status}</span><p>${esc(s.abstract)}</p>
       ${s.reviewed ? '<span class="ok">✔ parecer enviado</span>' : `<div class="toolbar"><select data-score="${s.id}">
         ${[3, 2, 1, 0, -1, -2, -3].map(v => `<option value="${v}">${v}</option>`).join('')}</select>
         <input data-comment="${s.id}" placeholder="Comentário"><button data-review="${s.id}">Enviar parecer</button></div>`}</div>`).join('')
@@ -201,6 +212,42 @@ async function loadQueue() {
       submission_id: +id, reviewer_id: S.user.id, score: +$(`[data-score="${id}"]`).value, comment: $(`[data-comment="${id}"]`).value } });
     alert(`Média ${r.average} → ${r.status}`); loadQueue();
   };
+}
+
+async function loadOrg() {
+  const [regs, users, sessions] = await Promise.all([
+    api('registration', '/registrations'), api('users', '/users'), api('events', '/sessions')]);
+  const name = Object.fromEntries(users.map(u => [u.id, u.name]));
+  const subs = svcOn('submissions') ? await api('submissions', '/submissions') : [];
+  const count = st => regs.filter(r => r.status === st).length;
+  const stat = (n, label) => `<div class="card stat"><b>${n}</b><span class="meta">${label}</span></div>`;
+  $('#org-stats').innerHTML = stat(regs.length, 'inscrições') + stat(count('approved'), 'confirmadas') +
+    stat(count('pending'), 'pagamento pendente') + stat(sessions.length, 'sessões na programação') +
+    (svcOn('submissions') ? stat(subs.length, 'trabalhos submetidos') + stat(subs.filter(s => s.status === 'accepted').length, 'aceitos') : '');
+  const reg = { approved: '<span class="ok">confirmada</span>', pending: '<span class="warn">pendente</span>', refused: '<span class="bad">recusada</span>' };
+  $('#org-regs').innerHTML = regs.length ? '<table class="tbl"><tr><th>Participante</th><th>Situação</th><th>Pagamento</th><th>Valor</th><th>Data</th></tr>' +
+    regs.map(r => `<tr><td>${esc(name[r.user_id] || r.user_id)}</td><td>${reg[r.status] || r.status}</td><td>${r.method}</td><td>R$ ${r.amount.toFixed(2)}</td><td>${r.created_at}</td></tr>`).join('') + '</table>'
+    : '<p class="muted">Nenhuma inscrição ainda. Entre como participante e faça uma inscrição para vê-la aqui.</p>';
+  $('#org-subs-box').hidden = !svcOn('submissions');
+  const label = { submitted: 'submetido', under_review: 'em revisão', accepted: 'ACEITO', rejected: 'rejeitado' };
+  $('#org-subs').innerHTML = subs.length ? '<table class="tbl"><tr><th>#</th><th>Título</th><th>Autores</th><th>Formato</th><th>Status</th></tr>' +
+    subs.map(s => `<tr><td>${s.id}</td><td>${esc(s.title)}</td><td>${esc(s.authors)}</td><td>${s.format}</td><td>${label[s.status]}</td></tr>`).join('') + '</table>'
+    : '<p class="muted">Nenhum trabalho submetido.</p>';
+  $('#session-form').onsubmit = async e => {
+    e.preventDefault();
+    const b = Object.fromEntries(new FormData(e.target));
+    b.tags = b.tags.split(',').map(x => x.trim()).filter(Boolean); b.track = b.track || null;
+    const s = await api('events', '/sessions', { method: 'POST', body: b });
+    alert(`Sessão [${s.id}] "${s.title}" cadastrada na programação.`); e.target.title.value = ''; loadOrg();
+  };
+  const mailOn = svcOn('notifications') && S.product.components.notification_channels?.includes('Email');
+  $('#org-mail-box').hidden = !mailOn;
+  if (mailOn) {
+    const mails = await api('notifications', '/outbox');
+    $('#org-mail').innerHTML = mails.length ? '<table class="tbl"><tr><th>Para</th><th>Assunto</th><th>Mensagem</th><th>Enviado em</th></tr>' +
+      mails.slice(0, 15).map(m => `<tr><td>${esc(m.to)}</td><td>${esc(m.subject)}</td><td>${esc(m.body)}</td><td>${m.sent_at}</td></tr>`).join('') + '</table>'
+      : '<p class="muted">Nenhum e-mail enviado ainda.</p>';
+  }
 }
 
 async function loadCerts() {

@@ -30,6 +30,32 @@
 
 <nav id="tabs" hidden></nav>
 <main id="app" hidden>
+  <p id="role-info" class="card role-info"></p>
+
+  <section data-tab="organizacao" data-feature="Programacao" data-label="Organização" data-roles="organizador">
+    <h2>Painel do evento <span class="badge" data-svc="registration"></span></h2>
+    <div id="org-stats" class="stats"></div>
+    <h2>Inscrições <span class="badge" data-svc="registration"></span></h2>
+    <div id="org-regs" class="card"></div>
+    <div id="org-subs-box">
+      <h2>Trabalhos submetidos <span class="badge" data-svc="submissions"></span></h2>
+      <div id="org-subs" class="card"></div>
+    </div>
+    <h2>Cadastrar sessão na programação <span class="badge" data-svc="events"></span></h2>
+    <form id="session-form" class="card form">
+      <input name="title" placeholder="Título da sessão" required minlength="3">
+      <div class="toolbar"><input name="speaker" placeholder="Palestrante"><input name="room" placeholder="Sala">
+        <select name="kind"><option>Palestra</option><option>Minicurso</option><option>Tutorial</option><option>Painel</option><option>Oficina</option></select></div>
+      <div class="toolbar"><input name="day" type="date" required value="2026-11-12"><input name="start" type="time" required value="17:00"><input name="track" placeholder="Trilha (opcional)"></div>
+      <input name="tags" placeholder="Tags separadas por vírgula (usadas pela recomendação)">
+      <button>Cadastrar sessão</button>
+    </form>
+    <div id="org-mail-box">
+      <h2>E-mails enviados pelo sistema <span class="badge" data-svc="notifications"></span></h2>
+      <div id="org-mail" class="card"></div>
+    </div>
+  </section>
+
   <section data-tab="programacao" data-feature="Programacao" data-label="Programação">
     <h2>Programação <span class="badge" data-svc="events"></span></h2>
     <div class="toolbar"><input id="q" placeholder="Buscar por tema, título, palestrante…"><select id="track" hidden></select></div>
@@ -50,7 +76,7 @@
     <div id="agenda"></div>
   </section>
 
-  <section data-tab="submissoes" data-feature="Submissao" data-label="Submissões">
+  <section data-tab="submissoes" data-feature="Submissao" data-label="Submissões" data-roles="autor">
     <h2>Submeter trabalho <span class="badge" data-svc="submissions"></span></h2>
     <form id="sub-form" class="card form">
       <input name="title" placeholder="Título" required minlength="5">
@@ -64,7 +90,7 @@
     <div id="my-subs"></div>
   </section>
 
-  <section data-tab="revisao" data-feature="Revisao" data-label="Revisão">
+  <section data-tab="revisao" data-feature="Revisao" data-label="Revisão" data-roles="revisor">
     <h2>Fila de revisão <span class="badge" data-svc="reviews"></span></h2>
     <p class="muted" id="policy"></p>
     <div id="queue"></div>
