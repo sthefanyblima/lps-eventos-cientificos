@@ -190,4 +190,13 @@ async def _proxy_request(svc: str, path: str, request: Request) -> Response:
     return Response(r.content, status_code=r.status_code, headers=out_headers)
 
 
-app.mount("/", StaticFiles(directory=ROOT / "frontend", html=True), name="frontend")
+class FrontendFiles(StaticFiles):
+    """Arquivos da interface sempre revalidados, para o navegador não exibir uma versão antiga após atualizar o produto."""
+
+    async def get_response(self, path, scope):
+        response = await super().get_response(path, scope)
+        response.headers["Cache-Control"] = "no-cache"
+        return response
+
+
+app.mount("/", FrontendFiles(directory=ROOT / "frontend", html=True), name="frontend")
